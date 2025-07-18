@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Failed</title>
+</head>
+<body>
+    <h1>❌ Payment Failed</h1>
+    <p>Unfortunately, your payment did not go through.</p>
+    <p>Please try again using the button below.</p>
+    <form action="{% url 'submit_reservation' %}" method="get">
+        <button type="submit">Try Again</button>
+    </form>
+</body>
+</html>

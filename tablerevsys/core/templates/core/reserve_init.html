@@ -1,0 +1,887 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <meta charset="UTF-8">
+    <title>Reserve a Table</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Lato', sans-serif;
+            background: url('/static/images/restaurant-blurred.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: bold;
+            max-width: 652px;  
+            margin: 0 auto;
+            justify-content: center;
+            position: relative;
+            display: flex;
+        }
+
+        .back-button {
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            margin-right: 15px;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .back-button:hover,
+        .back-button:active,
+        .back-button:visited {
+            color: white; 
+    }
+
+        .banner {
+            text-align: center;
+        }
+
+        .banner-overlay {
+            display: inline-block;
+            background-color: rgba(0,0,0,0.3);
+            width: 692px;
+        }
+
+        .banner img {
+            width: 300px;
+        }
+
+        .notice-box {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #e8e8e8;
+            padding: 30px 96px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .notice-box h2 {
+            margin-top: 0;
+        }
+
+        .notice-box p, .notice-box li {
+            line-height: 1.6;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif; 
+            width: 200px;   
+            height: 50px; 
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #333;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+
+            align-items: center;
+            justify-content: center;
+        }
+
+        .guest-modal {
+            background: #e0e0e0;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal-header {
+            position: relative;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            text-align: center;
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: black;
+        }
+
+        .selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 12px;
+        }
+
+        .selector label {
+            flex: 2;
+            font-weight: bold;
+        }
+
+        .selector input {
+            width: 50px;
+            height: 40px;
+            background-color: #e0e0e0;
+            border: 1px solid black;
+            text-align: center;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+        }
+
+        .selector button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid black;
+            background: #e0e0e0;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .selector button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .label-group {
+            text-align: left;
+            margin-bottom: 4px;
+        }
+
+        .label-group label {
+            font-weight: bold;
+            display: block;
+        }
+
+        .label-group .description {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #ccc;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .control-group button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .control-group input {
+            width: 40px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        body.modal-open .notice-box,
+        body.modal-open .banner,
+        body.modal-open .header {
+            filter: blur(4px);
+        }
+
+        .set-btn {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; 
+            gap: 8px; 
+            width: 200px;   
+            height: 50px;   
+            padding: 0 16px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            font-weight: 500;
+            background-color: #e0e0e0;
+            color: black;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin: 0 auto;   
+            display: flex;
+            border: 1px solid black;
+        }
+
+        .set-btn:hover {
+            background-color: #a8a8a8;
+        }
+        
+        .set-btn img {
+            height: 20px;         
+            width: 20px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .set-btn.selected {
+            background-color: black;
+            color: white;
+        }
+
+        .input-style {
+            width: 180px;
+            height: 50px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            background-color: #e0e0e0;
+            border: 1px solid black;
+            text-align: center;
+            color: black;
+            margin: 0 auto;
+            display: flex;
+            padding: 0 16px;
+            justify-content: center;
+        }
+
+        .input-icon-wrapper {
+            display: flex;
+            align-items: center;
+            width: 174px;
+            height: 50px;
+            background-color: #e0e0e0;
+            border: 1px solid black;
+            padding: 0 12px;
+            margin: 0 auto;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-icon-wrapper img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .input-icon-wrapper input {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            flex: 1;
+            outline: none;
+            text-align: left;
+            color: black;
+            cursor: pointer;
+        }
+
+        input.flatpickr-input {
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: black;
+            text-align: left;
+            width: 100%;
+            padding: 0;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        input.flatpickr-input::placeholder {
+            color: black;
+            opacity: 1;
+        }
+
+        .input-icon-wrapper:hover {
+            background-color: #a8a8a8;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .flatpickr-calendar {
+            font-family: 'Lato', sans-serif;
+            background-color: #e0e0e0;
+            border: none;
+            box-shadow: none;
+            margin: 0 auto;
+        }
+
+        .flatpickr-day {
+            color: black;
+        }
+
+        .flatpickr-day:hover {
+                background-color: #555 !important;  
+                color: white !important;
+                border: none;
+        }
+
+        .flatpickr-day.selected {
+            background-color: black;
+            color: white;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange,
+        .flatpickr-day.selected:hover {
+            background: #000000;      
+            color: white;
+            border-color: #000000;
+        }
+
+        #datepicker-container {
+            display: flex;
+            justify-content: center;
+        }
+
+       .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .time-btn.past {
+            text-decoration: line-through;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .time-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center; 
+            gap: 8px; 
+            width: 150px;   
+            height: 30px;   
+            padding: 0 10px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            font-weight: 500;
+            background-color: #e0e0e0;
+            color: black;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin: 0 auto;   
+            display: flex;
+            border: 1px solid black;
+        }
+
+        .time-btn:hover {
+            background-color: #a8a8a8;
+        }
+
+        .time-btn.selected {
+            background-color: black;
+            color: white;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="header">
+  <a href="javascript:history.back()" class="back-button" aria-label="Go Back">←</a>
+  <span class="header-title">The Bellington by Laniel and Myler Dim</span>
+</div>
+
+    <div class="banner">
+        <div class="banner-overlay">
+        <img src="/static/images/the-bellington.png" alt="Restaurant Logo">
+    </div>
+    </div>
+
+    <div class="notice-box">
+    <form method="POST" action="{% url 'check_availability' %}">
+    {% csrf_token %}
+
+    <div class="button-wrapper">
+        <button type="button" class="set-btn" onclick="toggleGuestPopup()">
+            <img src="{% static 'icons/guest.png' %}" alt="icon">
+            <span id="guest-total">0</span> Guests
+        </button>
+    </div>
+
+    <div class="button-wrapper">
+        <button type="button" class="set-btn" onclick="toggleBranchPopup()">
+            <img src="{% static 'icons/location.png' %}" alt="icon">
+        <span id="branch-btn-text">Select Branch</span>
+    </div>
+
+    <div class="button-wrapper">
+        <button type="button" class="set-btn" onclick="toggleDatePopup()">
+        <img src="{% static 'icons/date.png' %}" alt="Calendar Icon">
+        <span id="date-btn-text">Choose a Date</span>
+    </button>
+    </div>
+
+    <div class="button-wrapper">
+        <button type="button" class="set-btn" onclick="toggleTimePopup()">
+            <img src="{% static 'icons/time.png' %}" alt="icon">
+            <span id="time-btn-text">Select a time</span>
+        </button>
+    </div>
+
+    <input type="hidden" name="branch" id="hidden-branch">
+    <input type="hidden" name="date" id="hidden-date">  
+    <input type="hidden" name="time" id="hidden-time">
+    <input type="hidden" name="adults" id="hidden-adults">
+    <input type="hidden" name="seniors" id="hidden-seniors">
+    <input type="hidden" name="children" id="hidden-children">
+    <input type="hidden" name="babies" id="hidden-babies">
+
+    <div class="button-wrapper">
+        <button type="submit" class="btn">Check Availability</button>
+    </div>
+    </form>
+    </div>
+
+    <div id="guest-popup" class="modal-overlay">
+        <div class="guest-modal">
+        <div class="modal-header">
+        <h3>Guests</h3>
+        <button class="close-btn" onclick="toggleGuestPopup()">×</button>
+    </div>
+
+    <div class="selector">
+    <div class="label-group">
+    <label>Adults</label>
+    </div>
+    <div class="control-group">
+    <button id="adults-minus" onclick="changeGuest('adults', -1)">−</button>
+    <input type="text" id="adults" value="0" readonly>
+    <button id="adults-plus" onclick="changeGuest('adults', 1)">+</button>
+    </div>
+    </div>
+
+    <div class="selector">
+    <div class="label-group">
+    <label>Seniors</label>
+    <div class="description">Ages 60 and above</div>
+    </div>
+    <div class="control-group">
+    <button id="seniors-minus" onclick="changeGuest('seniors', -1)">−</button>
+    <input type="text" id="seniors" value="0" readonly>
+    <button id="seniors-plus" onclick="changeGuest('seniors', 1)">+</button>
+    </div>
+    </div>
+
+    <div class="selector">
+    <div class="label-group">
+    <label>Children</label>
+    <div class="description">Ages 4–9</div>
+    </div>
+    <div class="control-group">
+    <button id="children-minus" onclick="changeGuest('children', -1)">−</button>
+    <input type="text" id="children" value="0" readonly>
+    <button id="children-plus" onclick="changeGuest('children', 1)">+</button>
+    </div>
+    </div>
+
+    <div class="selector">
+    <div class="label-group">
+    <label>Babies</label>
+    <div class="description">Ages 3 and under</div>
+    </div>
+    <div class="control-group">
+    <button id="babies-minus" onclick="changeGuest('babies', -1)">−</button>
+    <input type="text" id="babies" value="0" readonly>
+    <button id="babies-plus" onclick="changeGuest('babies', 1)">+</button>
+    </div>
+    </div>
+
+    <div class="button-wrapper">
+      <button type="button" class="btn" onclick="confirmGuestPopup()">Confirm</button>
+    </div>
+    </div>
+    </div>
+
+    <div id="branch-popup" class="modal-overlay" style="display: none;">
+        <div class="guest-modal" style="width: 90%; max-width: 900px;">
+            <div class="modal-header">
+            <h3 style="margin: 0 auto;">Choose a Branch</h3>
+        <button class="close-btn" onclick="toggleBranchPopup()">×</button>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+      <div id="map" style="flex: 2; height: 400px; border-radius: 8px;"></div>
+
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+        <button class="set-btn branch-option" data-branch="The Bellington at The Fort" onclick="selectBranch('The Bellington at The Fort')">The Bellington at The Fort</button>
+        <button class="set-btn branch-option" data-branch="The Bellington at The Triangle" onclick="selectBranch('The Bellington at The Triangle')">The Bellington at The Triangle</button>
+        <button class="set-btn branch-option" data-branch="The Bellington at The Podium" onclick="selectBranch('The Bellington at The Podium')">The Bellington at The Podium</button> 
+
+        <div class="button-wrapper">
+            <button type="button" class="btn" onclick="confirmBranch()">Confirm</button>
+        </div>
+
+      </div>
+    </div>
+    </div>
+    </div>
+
+        <div id="date-popup" class="modal-overlay" style="display: none;">
+        <div class="guest-modal">
+        <div class="modal-header">
+        <h3 class="modal-title">Select a Date</h3>
+        <button class="close-btn" onclick="toggleDatePopup()">×</button>
+        </div>
+        <input type="text" id="datepicker" class="input-style" placeholder="Pick a date" readonly>
+        <div class="button-wrapper">
+        <button type="button" class="btn" onclick="confirmDate()">Confirm</button>
+        </div>
+        </div>
+        </div>
+    
+    <div id="time-popup" class="modal-overlay" style="display: none;">
+    <div class="guest-modal" style="width: 90%; max-width: 500px;">
+    <div class="modal-header">
+      <h3 style="margin: 0 auto;">Select a Time</h3>
+      <button class="close-btn" onclick="toggleTimePopup()">×</button>
+    </div>
+
+    <div id="time-options" class="time-grid"></div>
+
+    <div class="button-wrapper">
+      <button type="button" class="btn" onclick="confirmTime()">Confirm</button>
+    </div>
+    </div>
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    let tempGuests = {
+        adults: 0,
+        seniors: 0,
+        children: 0,
+        babies: 0
+    };
+    
+    function toggleGuestPopup() {
+    const popup = document.getElementById('guest-popup');
+    const isVisible = popup.style.display === 'flex';
+    popup.style.display = isVisible ? 'none' : 'flex';
+    document.body.classList.toggle('modal-open', !isVisible);
+
+    if (!isVisible) {
+        for (let key in tempGuests) {
+            document.getElementById(key).value = tempGuests[key];
+        }
+        updateGuestButtons();  
+    }
+}
+
+function closeGuestPopup() {
+    document.getElementById('guest-popup').style.display = 'none';
+    document.body.classList.remove('modal-open');
+}
+
+function changeGuest(type, delta) {
+    const input = document.getElementById(type);
+    let value = parseInt(input.value, 10);
+
+    const totalGuests = getGuestTotal();
+    const newValue = value + delta;
+    const newTotal = totalGuests + delta;
+
+    if (newValue < 0 || newTotal > 9) return;
+
+    input.value = newValue;
+
+    updateGuestButtons(); 
+}
+
+function confirmGuestPopup() {
+    ['adults', 'seniors', 'children', 'babies'].forEach(type => {
+        tempGuests[type] = parseInt(document.getElementById(type).value, 10);
+        document.getElementById(`hidden-${type}`).value = tempGuests[type];
+    });
+
+    const total = getGuestTotal();
+    document.getElementById('guest-total').textContent = total;
+
+    toggleGuestPopup();
+}
+
+function getGuestTotal() {
+    return ['adults', 'seniors', 'children', 'babies'].reduce((total, type) => {
+        return total + parseInt(document.getElementById(type).value, 10);
+    }, 0);
+}
+
+function updateGuestButtons() {
+    const total = getGuestTotal();
+
+    ['adults', 'seniors', 'children', 'babies'].forEach(type => {
+        const value = parseInt(document.getElementById(type).value, 10);
+        const minusBtn = document.getElementById(`${type}-minus`);
+        const plusBtn = document.getElementById(`${type}-plus`);
+
+        if (minusBtn) minusBtn.disabled = value === 0;
+        if (plusBtn) plusBtn.disabled = total >= 8;
+    });
+}
+
+    let map = null;
+    let markers = {};
+    let currentSelectedButton = null;
+    let selectedBranchName = null;
+
+    function toggleBranchPopup() {
+        const popup = document.getElementById('branch-popup');
+        const isVisible = popup.style.display === 'flex';
+        popup.style.display = isVisible ? 'none' : 'flex';
+
+        if (!isVisible) {
+            setTimeout(initMap, 100);  
+        }
+
+        document.body.classList.toggle('modal-open', !isVisible);
+    }
+
+    function selectBranch(branchName) {
+        if (currentSelectedButton) {
+            currentSelectedButton.classList.remove('selected');
+        }
+
+        const buttons = document.querySelectorAll('.branch-option');
+        buttons.forEach(btn => {
+            if (btn.dataset.branch === branchName) {
+                btn.classList.add('selected');
+                currentSelectedButton = btn;
+            }
+        });
+
+        selectedBranchName = branchName;
+
+        if (markers[branchName]) {
+            markers[branchName].openPopup();
+        }
+    }
+
+    function confirmBranch() {
+        if (selectedBranchName) {
+            document.getElementById('hidden-branch').value = selectedBranchName;
+            document.getElementById('branch-btn-text').textContent = selectedBranchName;
+
+            toggleBranchPopup(); 
+        } else {
+            alert("Please select a branch first.");
+        }
+    }
+
+    function initMap() {        
+        if (map) {
+            map.remove(); 
+        }
+
+        const mapDiv = document.getElementById('map');
+        mapDiv.innerHTML = '';
+
+        map = L.map('map').setView([14.56268, 121.04462], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const branches = [
+            { name: 'The Bellington at The Fort', coords: [14.55245, 121.04744] },
+            { name: 'The Bellington at The Triangle', coords: [14.55611, 121.02427] },
+            { name: 'The Bellington at The Podium', coords: [14.58542, 121.05938] }
+        ];
+
+        markers = {}; 
+
+        const buttons = document.querySelectorAll('.branch-option');
+
+        branches.forEach((branch, index) => {
+            const marker = L.marker(branch.coords).addTo(map);
+            marker.bindPopup(`<b>${branch.name}</b>`);
+            markers[branch.name] = marker;
+
+            const btn = buttons[index];
+            btn.addEventListener('mouseenter', () => marker.openPopup());
+            btn.addEventListener('mouseleave', () => marker.closePopup());
+        });
+    }
+
+    let selectedDate = null;
+    let datePickerInstance = null;
+
+    function toggleDatePopup() {
+        const popup = document.getElementById('date-popup');
+        const isVisible = popup.style.display === 'flex';
+        popup.style.display = isVisible ? 'none' : 'flex';
+        document.body.classList.toggle('modal-open', !isVisible);
+
+        if (!isVisible && !datePickerInstance) {
+            datePickerInstance = flatpickr("#datepicker", {
+                inline: true,
+                minDate: "today",
+                dateFormat: "Y-m-d",
+                onChange: function(selectedDates, dateStr) {
+                    selectedDate = dateStr;
+                }
+            });
+        }
+    }
+
+    function confirmDate() {
+        if (selectedDate) {
+            document.getElementById('hidden-date').value = selectedDate;
+            document.getElementById('date-btn-text').textContent = selectedDate;
+            toggleDatePopup();
+        } else {
+            alert("Please select a date.");
+        }
+    }
+
+    function toggleTimePopup() {
+        const popup = document.getElementById('time-popup');
+        const isVisible = popup.style.display === 'flex';
+        popup.style.display = isVisible ? 'none' : 'flex';
+        document.body.classList.toggle('modal-open', !isVisible);
+
+        if (!isVisible) {
+            generateTimeSlots(); 
+        }
+    }
+    
+   function generateTimeSlots() {
+        const container = document.getElementById('time-options');
+        container.innerHTML = '';
+
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+
+        const selectedStr = selectedDate;
+        const isToday = selectedStr === todayStr;
+
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+        const start = 11 * 60;
+        const end = 21 * 60 + 30;
+        const interval = 15;
+
+        const btns = [];
+
+        for (let mins = start; mins <= end; mins += interval) {
+            const hour = Math.floor(mins / 60);
+            const minute = mins % 60;
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = ((hour + 11) % 12 + 1);
+            const displayMinute = minute.toString().padStart(2, '0');
+            const label = `${displayHour}:${displayMinute} ${period}`;
+
+        const btn = document.createElement('button');
+        btn.className = 'time-btn time-slot';
+        btn.textContent = label;
+
+
+        if (isToday && mins < currentMins) {
+            btn.classList.add('past');
+        } else {
+            btn.onclick = () => {
+            selectedTime = label;
+            highlightTime(btn);
+      };
+    }
+
+    btns.push(btn);
+  }
+
+    btns.forEach((btn, i) => {
+        if (i === btns.length - 1 && btns.length % 3 === 1) {
+            const wrapper = document.createElement('div');
+            wrapper.style.gridColumn = '1 / span 3';
+            wrapper.style.display = 'flex';
+            wrapper.style.justifyContent = 'center';
+            wrapper.appendChild(btn);
+            container.appendChild(wrapper);
+        } else {
+        container.appendChild(btn);
+        }
+    });
+    }
+
+    function highlightTime(selectedBtn) {
+        const buttons = document.querySelectorAll('.time-slot');
+        buttons.forEach(btn => btn.classList.remove('selected'));
+        selectedBtn.classList.add('selected');
+    }
+
+    function confirmTime() {
+        if (selectedTime) {
+            document.getElementById('hidden-time').value = selectedTime;
+            document.getElementById('time-btn-text').textContent = selectedTime;
+            toggleTimePopup();
+        } else {
+        alert("Please select a time.");
+    }
+    }
+
+    window.onload = () => {
+      loadTimeSlots();
+      updateGuestTotal();
+    };
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <meta charset="UTF-8">
+    <title>Personal Details</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Lato', sans-serif;
+            background: url('/static/images/restaurant-blurred.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: bold;
+            max-width: 652px;  
+            margin: 0 auto;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .banner {
+            text-align: center;
+        }
+
+        .banner-overlay {
+            display: inline-block;
+            background-color: rgba(0,0,0,0.3);
+            width: 692px;
+        }
+
+        .banner img {
+            width: 300px;
+        }
+
+        .notice-box {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #e8e8e8;
+            padding: 30px 96px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .notice-box h2 {
+            margin-top: 0;
+        }
+
+        .notice-box p, .notice-box li {
+            line-height: 1.6;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .confirm-btn {
+            padding: 12px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .confirm-btn:hover {
+            background-color: #333;
+        }
+
+        .name-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .half-field {
+            flex: 1;
+        }
+
+        .small-input {
+            width: 90%;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 95%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .field-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+        }
+
+        .summary-box {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .select-wrapper {
+            width: 105%;
+        }
+
+        
+    </style>
+</head>
+<body>
+    <div class="header">
+        The Bellington by Laniel and Myler Dim
+    </div>
+
+    <div class="banner">
+        <div class="banner-overlay">
+        <img src="/static/images/the-bellington.png" alt="Restaurant Logo">
+    </div>
+    </div>
+
+    <div class="notice-box">
+        <h2>Confirm Your Reservation</h2>
+
+        <form method="POST" action="{% url 'submit_reservation' %}">
+            {% csrf_token %}
+
+            <div class="name-row">
+                <div class="half-field">
+                    <label for="first_name">First Name</label>
+                    <input type="text" name="first_name" class="small-input" required>
+                </div>
+                <div class="half-field">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" name="last_name" class="small-input" required>
+                </div>
+            </div>
+
+            <label for="email">Email</label>
+            <input type="email" name="email" required>
+            
+            <label for="phone">Phone Number</label>
+            <input type="text" name="phone" required>
+            
+
+            <div class="summary-box">
+                <p><strong>Branch:</strong> {{ branch.name }}</p>
+                <p><strong>Date:</strong> {{ reservation_date }}</p>
+                <p><strong>Time:</strong> {{ reservation_time }}</p>
+                <p><strong>Guests:</strong> {{ guest_total }}</p>
+                <input type="hidden" name="branch_id" value="{{ branch.id }}">
+                <input type="hidden" name="reservation_date" value="{{ reservation_date }}">
+                <input type="hidden" name="reservation_time" value="{{ reservation_time }}">
+                <input type="hidden" name="guest_total" value="{{ guest_total }}">
+                <input type="hidden" name="table_code" value="{{ table_code }}">
+            </div>
+            
+            <div class="select-wrapper">
+                <label for="purpose">Purpose of Visit</label>
+                <select name="purpose" required>
+                <option value="">-- Select Purpose --</option>
+                <option value="Birthday">Birthday</option>
+                <option value="Anniversary">Anniversary</option>
+                <option value="Business Meeting">Business Meeting</option>
+                <option value="Casual Dining">Casual Dining</option>
+                <option value="Other">Other</option>
+            </select>
+            </div>
+           
+
+            <label for="allergies">Allergies / Dietary Restrictions</label>
+            <textarea name="allergies" rows="3" placeholder="Optional"></textarea>
+
+            <label for="requests">Special Requests</label>
+            <textarea name="requests" rows="3" placeholder="Optional"></textarea>
+
+            <div class="button-wrapper">
+                <button type="submit" class="confirm-btn">
+                    Confirm and continue
+                </button>
+            </a>
+        </div>
+           
+        </form>
+    </div>
+</body>
+</html>

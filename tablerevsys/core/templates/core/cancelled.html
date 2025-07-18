@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <title>Reservation Cancelled</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Lato', sans-serif;
+            background: url("{% static 'images/restaurant-blurred.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: bold;
+            max-width: 652px;  
+            margin: 0 auto;
+        }
+
+        .banner {
+            text-align: center;
+        }
+
+        .banner-overlay {
+            display: inline-block;
+            background-color: rgba(0,0,0,0.3);
+            width: 692px;
+        }
+
+        .banner img {
+            width: 300px;
+        }
+
+        .notice-box {
+            max-width: 500px;
+            margin: 2rem auto;
+            background-color: #e8e8e8;
+            padding: 30px 96px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .notice-box h1 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
+
+        .notice-box p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .confirm-btn {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .confirm-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        The Bellington by Laniel and Myler
+    </div>
+
+    <div class="banner">
+        <div class="banner-overlay">
+            <img src="{% static 'images/the-bellington.png' %}" alt="Restaurant Logo">
+        </div>
+    </div>
+
+    <div class="notice-box">
+        <h1>Reservation Cancelled</h1>
+        <p>Your reservation has been successfully cancelled.</p>
+
+
+        <a href="{% url 'reserve_init' %}" class="confirm-btn">Make a New Reservation</a>
+    </div>
+</body>
+</html>

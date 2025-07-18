@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <meta charset="UTF-8">
+    <title>Reservation Alt</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Lato', sans-serif;
+            background: url('/static/images/restaurant-blurred.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: bold;
+            max-width: 652px;  
+            margin: 0 auto;
+        }
+
+        .banner {
+            text-align: center;
+        }
+
+        .banner-overlay {
+            display: inline-block;
+            background-color: rgba(0,0,0,0.3);
+            width: 692px;
+        }
+
+        .banner img {
+            width: 300px;
+        }
+
+        .notice-box {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #e8e8e8;
+            padding: 30px 96px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .notice-box h2 {
+            margin-top: 0;
+        }
+
+        .notice-box p, .notice-box li {
+            line-height: 1.6;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .confirm-btn {
+            padding: 12px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .confirm-btn:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        The Bellington by Laniel and Myler Dim
+    </div>
+
+    <div class="banner">
+        <div class="banner-overlay">
+        <img src="/static/images/the-bellington.png" alt="Restaurant Logo">
+    </div>
+    </div>
+
+    <div class="notice-box">
+    <h2>We're Sorry!</h2>
+    <p>
+        Unfortunately, there are no available tables at <strong>{{ selected_branch }}</strong> on
+        <strong>{{ selected_date }}</strong> at <strong>{{ selected_time }}</strong> for
+        <strong>{{ guest_count }}</strong> guests.
+    </p>
+
+    {% if alt_branches_same_time %}
+        <h3>However, we have availability at these branches at the same time:</h3>
+        <div class="button-wrapper">
+            {% for branch in alt_branches_same_time %}
+                <button type="button" class="set-btn">{{ branch }}</button>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <hr style="margin: 20px 0;">
+
+    <h3>Or you may choose from these available times:</h3>
+
+    {% if same_branch_alt_times %}
+        <p><strong>Same branch</strong> on {{ selected_date }}:</p>
+        <div class="button-wrapper">
+            {% for time in same_branch_alt_times %}
+                <button type="button" class="set-btn">{{ time }}</button>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if same_branch_other_days %}
+        <p><strong>Same branch</strong> on other dates:</p>
+        {% for date, times in same_branch_other_days.items %}
+            <div style="margin-bottom: 10px;">
+                <p style="margin: 0;"><strong>{{ date }}</strong></p>
+                <div class="button-wrapper">
+                    {% for time in times %}
+                        <button type="button" class="set-btn">{{ time }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if other_branches_other_days %}
+        <p><strong>Other branches</strong> on other dates:</p>
+        {% for label, times in other_branches_other_days.items %}
+            <div style="margin-bottom: 10px;">
+                <p style="margin: 0;"><strong>{{ label }}</strong></p>
+                <div class="button-wrapper">
+                    {% for time in times %}
+                        <button type="button" class="set-btn">{{ time }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <hr style="margin: 30px 0;">
+
+    <div class="button-wrapper">
+        <a href="{% url 'waitlist' %}" class="btn">Join the Waitlist</a>
+    </div>
+</div>
+
+</body>
+</html>

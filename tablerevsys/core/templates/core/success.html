@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <meta charset="UTF-8">
+    <title>Reservation Notices</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Lato', sans-serif;
+            background: url('/static/images/restaurant-blurred.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .header {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: bold;
+            max-width: 652px;  
+            margin: 0 auto;
+        }
+
+        .banner {
+            text-align: center;
+        }
+
+        .banner-overlay {
+            display: inline-block;
+            background-color: rgba(0,0,0,0.3);
+            width: 692px;
+        }
+
+        .banner img {
+            width: 300px;
+        }
+
+        .notice-box {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #e8e8e8;
+            padding: 30px 96px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .notice-box h2 {
+            margin-top: 0;
+        }
+
+        .notice-box p, .notice-box li {
+            line-height: 1.6;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .confirm-btn {
+            padding: 12px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .confirm-btn:hover {
+            background-color: #333;
+        }
+
+        .btn {
+            padding: 12px;
+            font-size: 16px;
+            font-family: 'Lato', sans-serif; 
+            width: 200px;   
+            height: 50px; 
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        The Bellington by Laniel and Myler
+    </div>
+
+    <div class="banner">
+        <div class="banner-overlay">
+        <img src="/static/images/the-bellington.png" alt="Restaurant Logo">
+    </div>
+    </div>
+
+    <div class="notice-box">
+        <h2>Booking Available</h2>
+
+        <input type="hidden" name="branch_id" value="{{ branch.id }}">
+        <input type="hidden" name="table_code" value="{{ table.code }}">
+        <input type="hidden" name="reservation_date" value="{{ start_time|date:'Y-m-d' }}">
+        <input type="hidden" name="reservation_time" value="{{ start_time|date:'h:i A' }}">
+        <input type="hidden" name="guest_total" value="{{ guest_data.total }}">
+            
+        <p><strong>Branch:</strong> {{ branch.name }}</p>
+        <p><strong>Table:</strong>{{ table.capacity }} seats</p>
+        <p><strong>Date & Time:</strong> {{ start_time|date:"F j, Y" }} at {{ start_time|time:"g:i A" }}</p>
+        <h4 style="margin-bottom: 8px;">Guest Details</h4>
+        <ul style="list-style: none; padding-left: 0;">
+            <li><strong>Total Guests:</strong> {{ guest_data.total }}</li>
+            <li>Adults: {{ guest_data.adults }}</li>
+            <li>Seniors: {{ guest_data.seniors }}</li>
+            <li>Children: {{ guest_data.children }}</li>
+            <li>Babies: {{ guest_data.babies }}</li>
+        </ul>
+
+        <div class="button-wrapper">
+            <a href="{% url 'details' %}">
+                <button class="confirm-btn">
+                    Confirm details
+                </button>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
